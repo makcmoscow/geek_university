@@ -12,13 +12,13 @@ class Server:
         try:
             IP = sys.argv[1]
         except IndexError:
-            IP = ''
+            IP = self.host
         try:
-            PORT = int(sys.argv[2])
+            PORT = sys.argv[2]
         except IndexError:
-            PORT = 7777
+            PORT = self.port
         except ValueError:
-            print('Порт должен быть целым числом, а не {}'.format(PORT))
+            print('Порт должен быть целым числом')
             sys.exit(0)
         self.server_sock.bind(("{}".format(IP), int(PORT)))
         self.server_sock.listen(5)
