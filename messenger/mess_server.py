@@ -3,7 +3,7 @@ import json
 import sys
 
 class Server:
-    def __init__(self, host = '127.0.0.1', port = 7777, timeout=10):
+    def __init__(self, host='127.0.0.1', port=7777, timeout=10):
         self.host = host
         self.port = port
         self.server_sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0)  # TCP
@@ -20,13 +20,14 @@ class Server:
         except ValueError:
             print('Порт должен быть целым числом')
             sys.exit(0)
+        print(IP, PORT)
         self.server_sock.bind(("{}".format(IP), int(PORT)))
         self.server_sock.listen(5)
         self.server_sock.settimeout(10)
         self.sock, addr = server.server_sock.accept()
         return self.sock
 
-    def s_send(self, data):
+    def send_mess(self, data):
         data = json.dumps(data).encode()
         self.sock.sendall(data)
 
@@ -49,6 +50,6 @@ if __name__ == '__main__':
 
     server = Server()
     payload = preparing_responce(server.s_recieve())
-    server.s_send(payload)
+    server.send_mess(payload)
 
 
