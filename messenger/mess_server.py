@@ -2,47 +2,38 @@ import socket
 import json
 import sys
 import time
+import select
+from shared_utils import parser
+
+
+IP, PORT = parser()
 
 class Server:
     # Инициализируем входные данные и создаем серверный сокет
-    def __init__(self, host='127.0.0.1', port=7777, timeout=10):
-        self.host = host
-        self.port = port
+    def __init__(self):
         self.server_sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0)  # TCP
-
-    # парсим параметры командной строки и проверяем их на валидность
-    def connection(self):
-        try:
-            IP = sys.argv[1]
-        except IndexError:
-            IP = self.host
-        try:
-            PORT = sys.argv[2]
-        except IndexError:
-            PORT = self.port
-        except ValueError:
-            print('Порт должен быть целым числом')
-            sys.exit(0)
-        self.server_sock.bind((IP, int(PORT)))
+        self.server_sock.bind((IP, PORT))
         self.server_sock.listen(5)
         self.server_sock.settimeout(10)
+
+    def connection(self):
         self.sock, addr = server.server_sock.accept()
         return self.sock
 
-    def send_mess(self, data):
+    def send_message(self, data):
         data = json.dumps(data).encode()
         self.sock.sendall(data)
 
-    def s_recieve(self):
-        data = b''
-        data += self.connection().recv(1024)
+    def get_message(self):
+        data = self.connection().recv(1024)
+        data = data.decode()
+        data = json.loads(data)
         return data
 
-def preparing_responce(recieved_presence):
-    recieved_presence = recieved_presence.decode()
-    recieved_presence = json.loads(recieved_presence)
-    if 'action' in recieved_presence and recieved_presence['action'] == 'presence'\
-            and 'time' in recieved_presence and isinstance((recieved_presence['time']), float):
+
+def preparing_responce(recieved_message):
+    if 'action' in recieved_message and recieved_message['action'] == 'presence'\
+            and 'time' in recieved_message and isinstance((recieved_message['time']), float):
         return {'responce': 200,
                 'time': time.time()
                 }
@@ -54,7 +45,7 @@ def preparing_responce(recieved_presence):
 if __name__ == '__main__':
 
     server = Server()
-    payload = preparing_responce(server.s_recieve())
-    server.send_mess(payload)
+    responce = preparing_responce(server.get_message())
+    server.send_message(responce)
 
 
