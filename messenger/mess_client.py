@@ -50,12 +50,18 @@ def create_presence(user_name = 'guest'):
     }
     return presence
 
+def translating_message(message):
+    if message['responce'] == 200:
+        return 'OK'
+    elif message['responce'] == 400:
+        return 'shit'
+
 # Создаем экземпляр класса Клиент
 client = Client(IP, PORT)
 # Отправляем сообщение о присутствии
 client.send_mess(create_presence())
 # Печатаем ответ от сервера
-print(client.recieve())
+print(translating_message(client.recieve()))
 
 
 
