@@ -15,3 +15,15 @@ def parser():
         print('Порт должен быть целым числом, а не {}'.format(sys.argv[2]))
         sys.exit(0)
     return IP, PORT
+
+
+def send_message(conn, data):
+    data = json.dumps(data).encode()
+    conn.sendall(data)
+
+
+def get_message(conn):
+    data = conn.recv(1024)
+    data = data.decode()
+    data = json.loads(data)
+    return data

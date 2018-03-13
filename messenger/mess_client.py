@@ -2,24 +2,15 @@ import socket
 import json
 import sys
 import time
-from shared_utils import parser
+from shared_utils import parser, send_message, get_message
 
 print(parser()[0])
 # Создаем класс Клиент, с методами отправки и получения сообщений
 class Client:
-    def __init__(self, host = '127.0.0.1', port = 7777, timeout=None):
+    def __init__(self, host = '127.0.0.1', port = 7777, timeout=10):
         self.host = host
         self.port = port
         self.sock = socket.create_connection((host, port), timeout)
-
-    def send_mess(self, data):
-        data = json.dumps(data).encode()
-        self.sock.sendall(data)
-
-    def recieve(self):
-        data = self.sock.recv(1024)
-        data = json.loads(data.decode())
-        return data
 
 # Функция создания сообщения о присутствии
 
@@ -45,12 +36,10 @@ def translating_message(message):
 # Создаем экземпляр класса Клиент
 IP, PORT = parser()
 client = Client(IP, PORT)
-print('created client')
 # Отправляем сообщение о присутствии
-client.send_mess(create_presence())
-print('sended message')
+send_message(client.sock, create_presence())
 # Печатаем ответ от сервера
-print(translating_message(client.recieve()))
+print(translating_message(get_message(client.sock)))
 
 
 
