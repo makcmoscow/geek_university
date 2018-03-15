@@ -1,8 +1,6 @@
 import socket
-import json
-import sys
-import time
 from shared_utils import parser, send_message, get_message
+import messages
 
 
 # Создаем класс Клиент, с методами отправки и получения сообщений
@@ -15,31 +13,39 @@ class Client:
 # Функция создания сообщения о присутствии
 
 
-def create_presence(user_name = 'guest'):
-    presence = {
-        'action': 'presence',
-        'time': time.time(),
-        'user': {
-            'account_name': user_name
-        }
-    }
-    return presence
+    def create_presence(self, user_name = 'guest'):
+        presence = messages.f_presence()
+        return presence
+
+    def create_message(self, user_name = 'guest'):
+        message = messages.f_msg()
+        return message
 
 
-def translating_message(message):
-    if message['responce'] == 200:
-        return 'OK'
-    elif message['responce'] == 400:
-        return 'shit'
+    def translating_message(self, message):
+        if message['responce'] == 200:
+            return 'OK'
+        elif message['responce'] == 400:
+            return 'shit'
 
-while 1:
-    # Создаем экземпляр класса Клиент
-    IP, PORT = parser()
-    client = Client(IP, PORT)
-    # Отправляем сообщение о присутствии
-    send_message(client.sock, create_presence())
-    # Печатаем ответ от сервера
-    print(translating_message(get_message(client.sock)))
+
+# Создаем экземпляр класса Клиент
+IP, PORT = parser()
+client = Client(IP, PORT)
+# Отправляем сообщение о присутствии
+send_message(client.sock, client.create_presence())
+# Печатаем ответ от сервера
+response = client.translating_message(get_message(client.sock))
+
+print(response)
+# if response == 'OK':
+#     a = client.create_message()
+#     print(a)
+#     send_message(client.sock, a)
+#     response = get_message(client.sock)
+#     print(response)
+
+
 
 
 

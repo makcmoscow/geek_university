@@ -1,5 +1,4 @@
 import socket
-import json
 import time
 import select
 from shared_utils import parser, send_message, get_message
@@ -64,15 +63,24 @@ class Server:
                     sock.close()
                     all_clients.remove(sock)
 
-def preparing_responce(recieved_message):
-    if 'action' in recieved_message and recieved_message['action'] == 'presence'\
-            and 'time' in recieved_message and isinstance((recieved_message['time']), float):
-        return {'responce': 200,
-                'time': time.time()
-                }
-    else:
-        return {'responce': 400,
-                'error': 'Неверный запрос'}
+    def preparing_responce(self, recieved_message):
+        if 'action' in recieved_message and recieved_message['action'] == 'presence'\
+                and 'time' in recieved_message and isinstance((recieved_message['time']), float):
+            return {'responce': 200,
+                    'time': time.time()
+                    }
+
+        # elif 'action' in recieved_message and recieved_message['action'] == 'msg'\
+        #         and 'time' in recieved_message and isinstance((recieved_message['time']), float):
+        #     resp = {'responce': 200,
+        #             'time': time.time()
+        #             }
+        #     return '111'
+
+
+        else:
+            return {'responce': 400,
+                    'error': 'Неверный запрос'}
 
 
 if __name__ == '__main__':
@@ -83,9 +91,9 @@ if __name__ == '__main__':
         try:
             conn, addr = server.server_sock.accept() # Проверка подключений
             # получаем сообщение от клиента
-            presence = get_message(conn)
+            message = get_message(conn)
             # формируем ответ
-            response = preparing_responce(presence)
+            response = server.preparing_responce(message)
             print(response)
             # отправляем ответ клиенту
             send_message(conn, response)
@@ -107,4 +115,3 @@ if __name__ == '__main__':
 
             requests = server.read_requests(r, clients)  # Получаем входные сообщения
             server.write_responses(requests, w, clients)  # Выполним отправку входящих сообщений
-

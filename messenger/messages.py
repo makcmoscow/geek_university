@@ -1,10 +1,10 @@
-from time import ctime
+import time
 
 
 def f_presence():
     presence = {
         'action': 'presence',
-        'time': ctime(),
+        'time': time.time(),
         'type': 'status',
         'user': {
             'account_name': 'CodeMaverick',
@@ -16,7 +16,7 @@ def f_presence():
 def f_auth():
     auth_message = {
         'action': 'authenticate',
-        'time': ctime(),
+        'time': time.time(),
         'user': {
             'account_name': 'CodeMaverick',
             'password': 'CorrectHorseBatteryStaple'
@@ -27,18 +27,18 @@ def f_auth():
 def f_msg():
     msg = {
         'action': 'msg',
-        'time': ctime(),
+        'time': time.time(),
         'to': 'account_name',
         'from': 'account_name',
         'encoding': 'utf-8',
-        'message': 'message'
+        'message': 'MESSAGE'
     }
     return msg
 
 def f_join():
     join_chat = {
         'action': 'join',
-        'time': ctime(),
+        'time': time.time(),
         'room': '#room_name'
     }
     return join_chat
@@ -46,7 +46,7 @@ def f_join():
 def f_leave():
     leave_chat = {
         'action': 'leave',
-        'time': ctime(),
+        'time': time.time(),
         'room': '#room_name'
     }
     return leave_chat
@@ -60,14 +60,14 @@ def f_quit():
 def f_probe():
     probe = {
         'action': 'probe',
-        'time': ctime()
+        'time': time.time()
     }
     return probe
 
 def f_alert(number, text):
     alert = {
         'response': number,
-        'time': ctime(),
+        'time': time.time(),
         'alert': text
     }
     return alert
@@ -75,7 +75,7 @@ def f_alert(number, text):
 def f_error(number, text):
     error = {
         'response': number,
-        'time': ctime(),
+        'time': time.time(),
         'error': text
     }
     return error
