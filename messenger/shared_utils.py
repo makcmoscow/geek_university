@@ -1,5 +1,6 @@
 import json
 import sys
+import time
 
 # парсим параметры командной строки и проверяем их на валидность
 def parser():
@@ -27,3 +28,10 @@ def get_message(conn):
     data = data.decode()
     data = json.loads(data)
     return data
+
+def preparing_responce(recieved_message):
+    if 'action' in recieved_message and recieved_message['action'] == 'presence'\
+            and 'time' in recieved_message and isinstance((recieved_message['time']), float):
+        return {'responce': 200,
+                'time': time.time()
+            }

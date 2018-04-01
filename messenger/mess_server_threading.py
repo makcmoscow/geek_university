@@ -31,19 +31,21 @@ class Server():
         while 1:
             try:
                 clients = self.acception(self.clients)
-                print(clients)
+                # print(clients)
                 wait = 0
             except OSError as e:
                 pass
             try:
                 self.readers, self.writers, errors = select.select(clients, clients, [], wait)
                 print('readers: ',self.readers, 'writers ', self.writers)
-                # print(self.writers, self.readers)
+                print(self.writers, self.readers)
                 for writer in self.writers:
                     presence = get_message(writer)
-                    print('pres', presence)
-                    send_message(writer, preparing_responce(presence))
                     clients.remove(writer)
+
+                for reader in self.readers:
+                    send_message(writer, preparing_responce(presence))
+                    clients.remove(reader)
             except:
                 pass
 

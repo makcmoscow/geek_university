@@ -63,12 +63,7 @@ class Server:
                     sock.close()
                     all_clients.remove(sock)
 
-    def preparing_responce(self, recieved_message):
-        if 'action' in recieved_message and recieved_message['action'] == 'presence'\
-                and 'time' in recieved_message and isinstance((recieved_message['time']), float):
-            return {'responce': 200,
-                    'time': time.time()
-                    }
+
 
         # elif 'action' in recieved_message and recieved_message['action'] == 'msg'\
         #         and 'time' in recieved_message and isinstance((recieved_message['time']), float):
