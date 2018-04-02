@@ -8,8 +8,98 @@ except ImportError:
     sys.exit(13)
 
 from sqlalchemy import *
-engine = create_engine('mysql:///root:123456@localhost/cartridges_dump.sql', echo=True)
-connection = engine.connect()
+from sqlalchemy.orm import mapper, sessionmaker
+engine = create_engine('sqlite:///cartridges.sqlite', echo=True)
+
+metadata = MetaData()
+rooms_priority = Table('rooms_priority', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('priority', String))
+
+is_color = Table('is_color', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('type', String))
+
+brands_printers = Table('brands_printers', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('type', String))
+
+rooms = Table('rooms', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('number', Integer),
+    Column('priority', String))
+
+printers_models = Table('printers_models', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('model', String))
+
+printers = Table('printers', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('model_id', Integer),
+    Column('is_color_id', Integer),
+    Column('brands_printers_id', Integer),
+    Column('rooms_id', Integer))
+
+cartridges = Table('cartridges', metadata,
+    Column('id', Integer, primary_key=True, autoincrement=True),
+    Column('printers_models_id', Integer),
+    Column('quantity', Integer),
+    Column('alert_quantity', Integer))
+
+metadata.create_all(engine)
+
+class Is_color:
+    def __init__(self, type):
+        self.type = type
+
+
+class Cartridges:
+    def __init__(self, printers_models_id, quantity, alert_quantity):
+        self.printers_models_id = printers_models_id
+        self. quantity = quantity
+        self.alert_quantity = alert_quantity
+
+class Printers_models:
+    def __init__(self, model):
+        self.model = model
+
+
+def adding_printers_model():
+    m = mapper(Printers_models, printers_models)
+    model = input('Введите модель принтера')
+    new_printer = Printers_models(model)
+    pushing(new_printer)
+
+def pushing(created_element):
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    session.add(created_element)
+    session.commit()
+    session.close()
+
+def adding_new_cartridge():
+    printers_model_id = 1
+    cartridge_quantity = int(input())
+    alert_quantity = int(input())
+    m = mapper(Cartridges, cartridges)
+    new_cartridge = Cartridges(printers_model_id, cartridge_quantity, alert_quantity)
+    pushing(new_cartridge)
+
+adding_printers_model()
+# class Rooms:
+#     def __init__(self, id, number, priority):
+#         self.id = id
+#         self.name = number
+#         self.priority = priority
+#
+# m = mapper(Rooms, rooms)
+# input_room = input('enter room and priority')
+
+
+
+
+# engine = create_engine('mysql:///root:123456@localhost/cartridges_dump.sql', echo=True)
+# connection = engine.connect()
 
 # for row in engine.execute('select * from table where id < %s', 2):
 #     print(dict(row))
