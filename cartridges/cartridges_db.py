@@ -1,4 +1,8 @@
 import sys
+from cartridges_gui import *
+starter = Starter()
+starter.start()
+print(starter.data)
 # Проверим версию SQLAlchemy
 try:
     import sqlalchemy
@@ -85,7 +89,10 @@ def adding_new_cartridge():
     new_cartridge = Cartridges(printers_model_id, cartridge_quantity, alert_quantity)
     pushing(new_cartridge)
 
-adding_printers_model()
+
+
+
+
 # class Rooms:
 #     def __init__(self, id, number, priority):
 #         self.id = id
