@@ -32,14 +32,14 @@ def translating_message(message):
     elif message['responce'] == 400:
         return 'shit'
 
-while 1:
-    # Создаем экземпляр класса Клиент
-    IP, PORT = parser()
-    client = Client(IP, PORT)
-    # Отправляем сообщение о присутствии
-    send_message(client.sock, create_presence())
-    # Печатаем ответ от сервера
-    print(translating_message(get_message(client.sock)))
+
+# Создаем экземпляр класса Клиент
+IP, PORT = parser()
+client = Client(IP, PORT)
+# Отправляем сообщение о присутствии
+send_message(client.sock, create_presence())
+# Печатаем ответ от сервера
+print(translating_message(get_message(client.sock)))
 
 
 
