@@ -1,8 +1,9 @@
 import sys
 from cartridges_gui import *
-starter = Starter()
-starter.start()
-print(starter.data)
+gui = AddPrinter()
+print(gui.start())
+
+
 # Проверим версию SQLAlchemy
 try:
     import sqlalchemy
@@ -66,7 +67,6 @@ class Cartridges:
 class Printers_models:
     def __init__(self, model):
         self.model = model
-
 
 def adding_printers_model():
     m = mapper(Printers_models, printers_models)

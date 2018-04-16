@@ -1,8 +1,6 @@
 import socket
-import time
 import select
-from shared_utils import parser, send_message, get_message
-
+from shared_utils import parser, send_message, get_message, preparing_responce
 IP, PORT = parser()
 
 class Server:
@@ -15,8 +13,9 @@ class Server:
 
 
     def connection(self):
-        self.sock, addr = server.server_sock.accept()
+        self.sock, self.addr = server.server_sock.accept()
         return self.sock
+
 
     def read_requests(self, r_clients, all_clients):
         """
@@ -84,18 +83,18 @@ if __name__ == '__main__':
     clients = []
     while True:
         try:
-            conn, addr = server.server_sock.accept() # Проверка подключений
+            conn = server.connection() # Проверка подключений
             # получаем сообщение от клиента
             message = get_message(conn)
             # формируем ответ
-            response = server.preparing_responce(message)
+            response = preparing_responce(message)
             print(response)
             # отправляем ответ клиенту
             send_message(conn, response)
         except OSError as e:
             pass  # timeout вышел
         else:
-            print("Получен запрос на соединение от %s" % str(addr))
+            print("Получен запрос на соединение от %s" % str(server.addr))
             # Добавляем клиента в список
             clients.append(conn)
         finally:
