@@ -1,35 +1,35 @@
 import time
 
 
-def f_presence():
+def f_presence(login):
     presence = {
         'action': 'presence',
         'time': time.time(),
         'type': 'status',
         'user': {
-            'account_name': 'CodeMaverick',
-            'status': 'Да, я здесь!'
+            'account_name': login,
+            'status': 'OK'
         }
     }
     return presence
 
-def f_auth():
+def f_auth(login):
     auth_message = {
         'action': 'authenticate',
         'time': time.time(),
         'user': {
-            'account_name': 'CodeMaverick',
+            'account_name': login,
             'password': 'CorrectHorseBatteryStaple'
         }
     }
     return auth_message
 
-def f_msg():
+def f_msg(login):
     msg = {
         'action': 'msg',
         'time': time.time(),
         'to': 'account_name',
-        'from': 'account_name',
+        'from': login,
         'encoding': 'utf-8',
         'message': 'MESSAGE'
     }

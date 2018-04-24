@@ -3,6 +3,7 @@ import select
 from shared_utils import parser, send_message, get_message, preparing_responce
 IP, PORT = parser()
 
+
 class Server:
     # Инициализируем входные данные и создаем серверный сокет
     def __init__(self):
@@ -31,13 +32,15 @@ class Server:
             try:
                 # Получаем входящие сообщения
                 message = get_message(sock)
+                print('mess: ', message)
                 # Добавляем их в список
                 # В идеале нам нужно сделать еще проверку, что сообщение нужного формата прежде чем его пересылать!
                 # Пока оставим как есть, этим займемся позже
                 messages.append(message)
             except:
                 print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
-                all_clients.remove(sock)
+                print(all_clients)
+                del all_clients[sock]
 
         # Возвращаем словарь сообщений
         return messages
@@ -60,7 +63,8 @@ class Server:
                 except:  # Сокет недоступен, клиент отключился
                     print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
                     sock.close()
-                    all_clients.remove(sock)
+                    print(all_clients)
+                    del all_clients[sock]
 
 
 
@@ -80,32 +84,40 @@ class Server:
 if __name__ == '__main__':
 
     server = Server()
-    clients = []
+    # Создаем словарик, где будут храниться пары username/socket
+    clients = {}
     while True:
         try:
             conn = server.connection() # Проверка подключений
+
             # получаем сообщение от клиента
             message = get_message(conn)
+            # из сообщения понимаем имя клиента и создаем пару username/socket
+            clients[message['user']['account_name']] = conn
             # формируем ответ
             response = preparing_responce(message)
-            print(response)
             # отправляем ответ клиенту
             send_message(conn, response)
         except OSError as e:
             pass  # timeout вышел
         else:
             print("Получен запрос на соединение от %s" % str(server.addr))
+            print(clients)
             # Добавляем клиента в список
-            clients.append(conn)
+
         finally:
             # Проверить наличие событий ввода-вывода
             wait = 0
             r = []
             w = []
             try:
-                r, w, e = select.select(clients, clients, [], wait)
+                r, w, e = select.select(clients.keys(), clients.keys(), [], wait)
+                print('r,w,e = ', r, w, e)
+                print(clients.keys())
             except:
                 pass  # Ничего не делать, если какой-то клиент отключился
 
             requests = server.read_requests(r, clients)  # Получаем входные сообщения
+            if requests:
+                print(requests)
             server.write_responses(requests, w, clients)  # Выполним отправку входящих сообщений

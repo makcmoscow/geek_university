@@ -3,10 +3,6 @@ import socket
 import time
 import json
 
-
-conn_well = False
-# user_name = input()
-
 user_name = '12'
 def connect(IP, PORT):
     conn = socket.create_connection((IP, int(PORT)), TIMEOUT)
@@ -57,7 +53,11 @@ def send_online(conn):
     return a
 
 conn = connect(IP, PORT)
-conn_exist = send_online(conn)
-if conn_exist:
+# conn_exist = send_online(conn)
+# if conn_exist:
+while 1:
     mess = input('Введите ваше сообщение ')
-    send_message(conn, mess)
+    try:
+        send_message(conn, mess)
+    except OSError:
+        pass
