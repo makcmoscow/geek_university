@@ -6,7 +6,7 @@ import messages
 my_login = 'max'
 # Создаем класс Клиент, с методами отправки и получения сообщений
 class Client:
-    def __init__(self, host = '127.0.0.1', port = 7777, timeout=1):
+    def __init__(self, host = '127.0.0.1', port = 7777, timeout=10):
         self.host = host
         self.port = port
         self.sock = socket.create_connection((host, port), timeout)

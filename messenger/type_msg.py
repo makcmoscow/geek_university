@@ -1,14 +1,14 @@
 from time import ctime
 
 
-def f_presence():
+def f_presence(user_name):
     presence = {
         'action': 'presence',
         'time': ctime(),
         'type': 'status',
         'user': {
-            'account_name': 'CodeMaverick',
-            'status': 'Да, я здесь!'
+            'account_name': user_name,
+            'status': 'OK'
         }
     }
     return presence
@@ -24,14 +24,14 @@ def f_auth():
     }
     return auth_message
 
-def f_msg():
+def f_msg(user_name, name_to, mess):
     msg = {
         'action': 'msg',
         'time': ctime(),
-        'to': 'account_name',
-        'from': 'account_name',
+        'to': name_to,
+        'from': user_name,
         'encoding': 'utf-8',
-        'message': 'message'
+        'message': mess
     }
     return msg
 

@@ -2,8 +2,9 @@ from Const import IP, PORT, TIMEOUT
 import socket
 import time
 import json
+from type_msg import *
+user_name = input('Введите имя пользователя')
 
-user_name = '12'
 def connect(IP, PORT):
     conn = socket.create_connection((IP, int(PORT)), TIMEOUT)
     return conn
@@ -23,18 +24,25 @@ def make_sendable(mess):
     bjmessage = jmessage.encode()
     return bjmessage
 
-def send_message(conn, mess):
-    conn.sendall(make_sendable(mess))
+def send_message(conn, user_name, name_to=None, mess=None):
+    message = f_msg(user_name, name_to, mess)
+    conn.sendall(make_sendable(message))
 
-def send_presence(conn):
-    mess = create_presence(user_name)
-    send_message(conn, mess)
+def send_presence(conn, user_name):
+    mess = f_presence(user_name)
+    conn.sendall(make_sendable(mess))
+    # mess = create_presence(user_name)
+
 
 def get_message(conn):
     bjmess = conn.recv(1024)
     jmess = bjmess.decode()
-    mess = json.loads(jmess)
-    return mess
+    try:
+        mess = json.loads(jmess)
+    except Exception as e:
+        pass
+    else:
+        return mess
 
 def chk_responce(resp):
     try:
@@ -53,11 +61,16 @@ def send_online(conn):
     return a
 
 conn = connect(IP, PORT)
-# conn_exist = send_online(conn)
-# if conn_exist:
+send_presence(conn, user_name)
 while 1:
+    name_to = input('For who? ')
     mess = input('Введите ваше сообщение ')
     try:
-        send_message(conn, mess)
+        send_message(conn, user_name, name_to, mess)
+    except OSError as e:
+        print(e)
+    try:
+        mess = get_message(conn)
+        print(mess)
     except OSError:
         pass
