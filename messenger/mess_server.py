@@ -1,54 +1,123 @@
 import socket
-import json
-import sys
+import select
+from shared_utils import parser, send_message, get_message, preparing_responce
+IP, PORT = parser()
+
 
 class Server:
-    def __init__(self, host = '127.0.0.1', port = 7777, timeout=10):
-        self.host = host
-        self.port = port
+    # Инициализируем входные данные и создаем серверный сокет
+    def __init__(self):
         self.server_sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_STREAM, proto=0)  # TCP
+        self.server_sock.bind((IP, PORT))
+        self.server_sock.listen(5)
+        self.server_sock.settimeout(0.2)
+
 
     def connection(self):
-        try:
-            IP = sys.argv[1]
-        except IndexError:
-            IP = self.host
-        try:
-            PORT = sys.argv[2]
-        except IndexError:
-            PORT = self.port
-        except ValueError:
-            print('Порт должен быть целым числом')
-            sys.exit(0)
-        self.server_sock.bind(("{}".format(IP), int(PORT)))
-        self.server_sock.listen(5)
-        self.server_sock.settimeout(10)
-        self.sock, addr = server.server_sock.accept()
+        self.sock, self.addr = server.server_sock.accept()
         return self.sock
 
-    def s_send(self, data):
-        data = json.dumps(data).encode()
-        self.sock.sendall(data)
 
-    def s_recieve(self):
-        data = b''
-        data += self.connection().recv(1024)
-        return data
+    def read_requests(self, r_clients, all_clients):
+        """
+        Чтение сообщений, которые будут посылать клиенты
+        :param r_clients: клиенты которые могут отправлять сообщения
+        :param all_clients: все клиенты
+        :return:
+        """
+        # Список входящих сообщений
+        messages = []
 
-def preparing_responce(recieved_presence):
-    recieved_presence = recieved_presence.decode()
-    recieved_presence = json.loads(recieved_presence)
-    if 'action' in recieved_presence and recieved_presence['action'] == 'presence'\
-            and 'time' in recieved_presence and isinstance ((recieved_presence['time']), float):
-        return {'responce': 200}
-    else:
-        return {'responce': 400, 'error': 'Неверный запрос'}
+        for sock in r_clients:
+            try:
+                # Получаем входящие сообщения
+                message = get_message(sock)
+                print('mess: ', message)
+                # Добавляем их в список
+                # В идеале нам нужно сделать еще проверку, что сообщение нужного формата прежде чем его пересылать!
+                # Пока оставим как есть, этим займемся позже
+                messages.append(message)
+            except:
+                print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
+                print(all_clients)
+                del all_clients[sock]
+
+        # Возвращаем словарь сообщений
+        return messages
+
+    def write_responses(self, messages, w_clients, all_clients):
+        """
+        Отправка сообщений тем клиентам, которые их ждут
+        :param messages: список сообщений
+        :param w_clients: клиенты которые читают
+        :param all_clients: все клиенты
+        :return:
+        """
+
+        for sock in w_clients:
+            # Будем отправлять каждое сообщение всем
+            for message in messages:
+                try:
+                    # Отправить на тот сокет, который ожидает отправки
+                    send_message(sock, message)
+                except:  # Сокет недоступен, клиент отключился
+                    print('Клиент {} {} отключился'.format(sock.fileno(), sock.getpeername()))
+                    sock.close()
+                    print(all_clients)
+                    del all_clients[sock]
+
+
+
+        # elif 'action' in recieved_message and recieved_message['action'] == 'msg'\
+        #         and 'time' in recieved_message and isinstance((recieved_message['time']), float):
+        #     resp = {'responce': 200,
+        #             'time': time.time()
+        #             }
+        #     return '111'
+
+
+        else:
+            return {'responce': 400,
+                    'error': 'Неверный запрос'}
 
 
 if __name__ == '__main__':
 
     server = Server()
-    payload = preparing_responce(server.s_recieve())
-    server.s_send(payload)
+    # Создаем словарик, где будут храниться пары username/socket
+    clients = {}
+    while True:
+        try:
+            conn = server.connection() # Проверка подключений
 
+            # получаем сообщение от клиента
+            message = get_message(conn)
+            # из сообщения понимаем имя клиента и создаем пару username/socket
+            clients[message['user']['account_name']] = conn
+            # формируем ответ
+            response = preparing_responce(message)
+            # отправляем ответ клиенту
+            send_message(conn, response)
+        except OSError as e:
+            pass  # timeout вышел
+        else:
+            print("Получен запрос на соединение от %s" % str(server.addr))
+            print(clients)
+            # Добавляем клиента в список
 
+        finally:
+            # Проверить наличие событий ввода-вывода
+            wait = 0
+            r = []
+            w = []
+            try:
+                r, w, e = select.select(clients.keys(), clients.keys(), [], wait)
+                print('r,w,e = ', r, w, e)
+                print(clients.keys())
+            except:
+                pass  # Ничего не делать, если какой-то клиент отключился
+
+            requests = server.read_requests(r, clients)  # Получаем входные сообщения
+            if requests:
+                print(requests)
+            server.write_responses(requests, w, clients)  # Выполним отправку входящих сообщений

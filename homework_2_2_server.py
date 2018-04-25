@@ -28,7 +28,7 @@ def mainloop():
             for s_client in w:
                 timestr = time.ctime(time.time()) + '\n'
                 try:
-                    s_client.send(timestr.encode('ascii'))
+                    s_client.send_message(timestr.encode('ascii'))
                 except:
                     clients.remove((s_client))
 print('Эхо-сервер запущен')
