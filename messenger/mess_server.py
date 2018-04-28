@@ -1,8 +1,17 @@
 import socket
 import select
+import json
 from shared_utils import parser, send_message, get_message, preparing_responce
+from threading import Thread
 IP, PORT = parser()
-
+# Список входящих сообщений
+messages = []
+class Message:
+    def __init__(self, sock, name_from, message, name_to = None):
+        self.sock = sock
+        self.name_from = name_from
+        self.name_to = name_to
+        self.message = message
 
 class Server:
     # Инициализируем входные данные и создаем серверный сокет
@@ -17,6 +26,19 @@ class Server:
         self.sock, self.addr = server.server_sock.accept()
         return self.sock
 
+    def _read(self, sock):
+        raw_message = b''
+        while not raw_message.endswith(b"\n\n"):
+            try:
+                raw_message += self.connection.recv(1024)
+            except socket.error as err:
+                print("error recv data", err)
+        payload = raw_message.decode()
+        message = payload[:-3]
+        print('message', message)
+        message = json.loads(message)
+        print(message)
+        return message
 
     def read_requests(self, r_clients, all_clients):
         """
@@ -25,13 +47,11 @@ class Server:
         :param all_clients: все клиенты
         :return:
         """
-        # Список входящих сообщений
-        messages = []
 
         for sock in r_clients:
             try:
                 # Получаем входящие сообщения
-                message = get_message(sock)
+                message = self._read(sock)
                 print('mess: ', message)
                 # Добавляем их в список
                 # В идеале нам нужно сделать еще проверку, что сообщение нужного формата прежде чем его пересылать!
@@ -89,11 +109,11 @@ if __name__ == '__main__':
     while True:
         try:
             conn = server.connection() # Проверка подключений
-
+            clients[conn] = None
             # получаем сообщение от клиента
             message = get_message(conn)
             # из сообщения понимаем имя клиента и создаем пару username/socket
-            clients[message['user']['account_name']] = conn
+            # clients[message['user']['account_name']] = conn
             # формируем ответ
             response = preparing_responce(message)
             # отправляем ответ клиенту

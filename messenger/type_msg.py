@@ -97,7 +97,7 @@ code = {
     '410': 'user offline',
     '500': 'server error'
 }
-
-a = '200'
-a = f_alert(a, code[a])
-print(a)
+if __name__ == '__main__':
+    a = '200'
+    a = f_alert(a, code[a])
+    print(a)

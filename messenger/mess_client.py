@@ -71,7 +71,7 @@ while 1:
         pass
     try:
         resp = get_message(client.sock)
-        print(resp)
+        print('resp', resp)
     except:
         pass
 
