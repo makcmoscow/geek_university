@@ -88,9 +88,10 @@ class WriteMessages(Thread):
 
 
 def get_name_socket(socket):
-    for sock, name in named_sockets.items():
-        if sock == socket:
-            return name
+    if socket in named_sockets: return named_sockets[socket]
+    # for sock, name in named_sockets.items():
+    #     if sock == socket:
+    #         return name
 
 def lookup(mess):
     if 'user' in mess:
@@ -98,12 +99,8 @@ def lookup(mess):
     return mess.get('from')
 
 def get_names(mess):
-    name_from = None
-    name_to = None
-    print('mess', mess)
     name_from = lookup(mess)
     name_to = mess.get('to')
-    print(name_from, name_to)
     return name_from, name_to
 
 
