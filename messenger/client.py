@@ -1,6 +1,7 @@
 # from Const import IP, PORT, TIMEOUT
-IP = '127.0.0.1'
+# IP = '127.0.0.1'
 PORT = 7777
+IP = input('Введите IP: ')
 TIMEOUT = 10
 import socket
 import time
@@ -8,16 +9,15 @@ import json
 from type_msg import *
 from threading import Thread
 import sys
-user_name = input('Введите имя пользователя')
-
+user_name = input('Введите имя пользователя: ')
 class WriteThread(Thread):
     def __init__(self):
         super().__init__()
     def run(self):
         while True:
             try:
-                name_to = input('For who? ')
-                mess = input('Введите ваше сообщение ')
+                name_to = input('Кому? ')
+                mess = input('Введите ваше сообщение: ')
                 a = send_message(conn, user_name, name_to, mess)
                 if a:
                     print('OK')
@@ -33,7 +33,9 @@ class ReadThread(Thread):
         while True:
             try:
                 mess = get_message(conn)
-                print(mess)
+                if 'message' in mess:
+                    print()
+                    print(mess['from'], '>>:', mess['message'])
             except OSError as e:
                 pass
 

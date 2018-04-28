@@ -4,7 +4,15 @@ import json
 import time
 from threading import Thread
 
-IP = '127.0.0.1'
+# IP = '127.0.0.1'
+# IP = input('Введите IP: ')
+
+def get_IP():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("8.8.8.8", 80))
+    return (s.getsockname()[0])
+IP = get_IP()
+print('IP адрес сервера: ', IP)
 PORT = 7777
 serv_sock = socket.socket(family=socket.AF_INET, type = socket.SOCK_STREAM, proto=0)
 serv_sock.setblocking(0)
@@ -73,24 +81,25 @@ class WriteMessages(Thread):
                                     'time': time.time()
                                     }
                         # print('responce sended')
-                        messages.remove(message)
-                        send_message(responce, reader)
+
+                        if send_message(responce, reader):
+                            messages.remove(message)
                         # readers.remove(reader)
 
 
                     elif message.name_to is not None and message.name_to == name_to:
                         # print(message.name_to)
-                        messages.remove(message)
-                        send_message(message.message, reader)  # Тут должна быть функция, подготавливающая сообщение перед отправкой
+
+                        if send_message(message.message, reader):  # Тут должна быть функция, подготавливающая сообщение перед отправкой
+                            messages.remove(message)
 
 
 
 
 
 def get_name_socket(socket):
-    for sock, name in named_sockets.items():
-        if sock == socket:
-            return name
+    if socket in named_sockets: return named_sockets[socket]
+
 
 def lookup(mess):
     if 'user' in mess:
@@ -128,6 +137,7 @@ def get_message(sock):
 def send_message(message, sock):
     data = json.dumps(message).encode()
     sock.sendall(data)
+    return True
 
 
 
