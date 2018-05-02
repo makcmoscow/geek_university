@@ -9,6 +9,13 @@ import json
 from type_msg import *
 from threading import Thread
 import sys
+import client_logger
+import logging
+from decorators import Log
+logger = logging.getLogger('client')
+log = Log(logger)
+
+
 user_name = input('Введите имя пользователя: ')
 class WriteThread(Thread):
     def __init__(self):
@@ -41,31 +48,36 @@ class ReadThread(Thread):
 
 
 
-
+@log
 def connect(IP, PORT):
     conn = socket.create_connection((IP, int(PORT)), 10)
+    logger.info('123')
     return conn
 
+@log
 def create_presence(user_name = 'guest'):
     presence = f_presence(user_name)
     return presence
 
+@log
 def make_sendable(mess):
     jmessage = json.dumps(mess)+'\n\n'
     bjmessage = jmessage.encode()
     return bjmessage
 
+@log
 def send_message(conn, user_name, name_to=None, mess=None):
     message = f_msg(user_name, name_to, mess)
     conn.sendall(make_sendable(message))
     return True
 
+@log
 def send_presence(conn, user_name):
     mess = f_presence(user_name)
     conn.sendall(make_sendable(mess))
     # mess = create_presence(user_name)
 
-
+@log
 def get_message(conn):
     bjmess = conn.recv(1024)
     jmess = bjmess.decode()
@@ -76,6 +88,7 @@ def get_message(conn):
     else:
         return mess
 
+@log
 def chk_responce(resp):
     try:
         if resp['responce'] == 200:
@@ -86,6 +99,7 @@ def chk_responce(resp):
     except Exception as e:
         print('error', e)
 
+@log
 def send_online(conn):
     send_presence(conn)
     resp = get_message(conn)
