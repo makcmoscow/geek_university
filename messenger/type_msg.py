@@ -1,55 +1,108 @@
 from time import ctime
 
+class Message:
+    def __init__(self, login):
+        self.login = login
 
-def f_presence(user_name):
-    presence = {
-        'action': 'presence',
-        'time': ctime(),
-        'type': 'status',
-        'user': {
-            'account_name': user_name,
-            'status': 'OK'
+    def f_presence(self):
+        presence = {
+            'action': 'presence',
+            'time': ctime(),
+            'type': 'status',
+            'user': {
+                'account_name': self.login,
+                'status': 'OK'
+            }
         }
-    }
-    return presence
+        return presence
 
-def f_auth():
-    auth_message = {
-        'action': 'authenticate',
-        'time': ctime(),
-        'user': {
-            'account_name': 'CodeMaverick',
-            'password': 'CorrectHorseBatteryStaple'
+    def f_auth(self):
+        auth_message = {
+            'action': 'authenticate',
+            'time': ctime(),
+            'user': {
+                'account_name': self.login,
+                'password': 'CorrectHorseBatteryStaple'
+            }
         }
-    }
-    return auth_message
+        return auth_message
 
-def f_msg(user_name, name_to, mess):
-    msg = {
-        'action': 'msg',
-        'time': ctime(),
-        'to': name_to,
-        'from': user_name,
-        'encoding': 'utf-8',
-        'message': mess
-    }
-    return msg
+    def f_msg(self, name_to, mess):
+        msg = {
+            'action': 'msg',
+            'time': ctime(),
+            'to': name_to,
+            'from': self.login,
+            'encoding': 'utf-8',
+            'message': mess
+        }
+        return msg
 
-def f_join():
-    join_chat = {
-        'action': 'join',
-        'time': ctime(),
-        'room': '#room_name'
-    }
-    return join_chat
+    def f_join(self):
+        join_chat = {
+            'action': 'join',
+            'time': ctime(),
+            'room': '#room_name'
+        }
+        return join_chat
 
-def f_leave():
-    leave_chat = {
-        'action': 'leave',
-        'time': ctime(),
-        'room': '#room_name'
-    }
-    return leave_chat
+    def f_leave(self):
+        leave_chat = {
+            'action': 'leave',
+            'time': ctime(),
+            'room': '#room_name'
+        }
+        return leave_chat
+
+# def f_presence(user_name):
+#     presence = {
+#         'action': 'presence',
+#         'time': ctime(),
+#         'type': 'status',
+#         'user': {
+#             'account_name': user_name,
+#             'status': 'OK'
+#         }
+#     }
+#     return presence
+
+# def f_auth():
+#     auth_message = {
+#         'action': 'authenticate',
+#         'time': ctime(),
+#         'user': {
+#             'account_name': 'CodeMaverick',
+#             'password': 'CorrectHorseBatteryStaple'
+#         }
+#     }
+#     return auth_message
+
+# def f_msg(user_name, name_to, mess):
+#     msg = {
+#         'action': 'msg',
+#         'time': ctime(),
+#         'to': name_to,
+#         'from': user_name,
+#         'encoding': 'utf-8',
+#         'message': mess
+#     }
+#     return msg
+
+# def f_join():
+#     join_chat = {
+#         'action': 'join',
+#         'time': ctime(),
+#         'room': '#room_name'
+#     }
+#     return join_chat
+
+# def f_leave():
+#     leave_chat = {
+#         'action': 'leave',
+#         'time': ctime(),
+#         'room': '#room_name'
+#     }
+#     return leave_chat
 
 def f_quit():
     quit = {

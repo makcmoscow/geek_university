@@ -17,6 +17,7 @@ log = Log(logger)
 
 
 user_name = input('Введите имя пользователя: ')
+messages = Message(user_name)
 class WriteThread(Thread):
     def __init__(self):
         super().__init__()
@@ -25,7 +26,7 @@ class WriteThread(Thread):
             name_to = input('Кому? ')
             mess = input('Введите ваше сообщение: ')
             try:
-                a = send_message(conn, user_name, name_to, mess)
+                a = send_message(conn, name_to, mess)
             except OSError:
                 sys.exit(1)
             else:
@@ -56,25 +57,20 @@ def connect(IP, PORT):
     return conn
 
 @log
-def create_presence(user_name = 'guest'):
-    presence = f_presence(user_name)
-    return presence
-
-@log
 def make_sendable(mess):
     jmessage = json.dumps(mess)+'\n\n'
     bjmessage = jmessage.encode()
     return bjmessage
 
 @log
-def send_message(conn, user_name, name_to=None, mess=None):
-    message = f_msg(user_name, name_to, mess)
+def send_message(conn, name_to=None, mess=None):
+    message = messages.f_msg(name_to, mess)
     conn.sendall(make_sendable(message))
     return True
 
 @log
-def send_presence(conn, user_name):
-    mess = f_presence(user_name)
+def send_presence(conn):
+    mess = messages.f_presence()
     conn.sendall(make_sendable(mess))
     # mess = create_presence(user_name)
 
@@ -108,7 +104,7 @@ def send_online(conn):
     return a
 
 conn = connect(IP, PORT)
-send_presence(conn, user_name)
+send_presence(conn)
 
 wr1 = WriteThread()
 wr1.start()
